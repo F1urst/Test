@@ -1,0 +1,226 @@
+---
+# Размещаем в пространстве имён для удобного управления
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-prod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindbox-app
+  namespace: app-prod
+  labels:
+    app: mindbox-app
+spec:
+  # 4 пода – по результатам нагрузочного теста
+  replicas: 4
+
+  # Стратегия обновления: RollingUpdate с maxSurge и maxUnavailable,
+  # чтобы сохранять отказоустойчивость при обновлениях
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # можно создать лишний под на время обновления
+      maxUnavailable: 1  # не больше 1 пода недоступно во время обновления
+
+  selector:
+    matchLabels:
+      app: mindbox-app
+
+  template:
+    metadata:
+      labels:
+        app: mindbox-app
+      annotations:
+        # Для сервисов mesh/мониторинга (опционально)
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      # Распределяем поды по зонам и нодам для отказоустойчивости
+      # topologySpreadConstraints – более гибко, чем podAntiAffinity
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: mindbox-app
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: mindbox-app
+
+      # Если нужно жёсткое распределение по разным нодам (дополнительно)
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: mindbox-app
+                topologyKey: kubernetes.io/hostname
+
+      containers:
+        - name: app
+          image: your-registry/mindbox-app:latest
+          ports:
+            - containerPort: 8080
+              name: http
+
+          # --- Управление ресурсами ---
+          # Запросы (requests) – для гарантии ресурсов при старте.
+          # Лимиты (limits) – для защиты от runaway потребления.
+          resources:
+            requests:
+              # При старте нужно много CPU, ставим 0.5, чтобы ускорить init,
+              # но не перегружать ноду. Можно подобрать точнее.
+              cpu: "500m"
+              memory: "256Mi"   # чуть больше, чем 128Mi, для запаса на старте
+            limits:
+              # Память – жёсткий лимит, т.к. потребление ровное.
+              # CPU – лимит выше, чем request, чтобы можно было кратковременно
+              # использовать больше при старте.
+              cpu: "1000m"      # 1 ядро – запас для инициализации
+              memory: "512Mi"   # запас на случай пиков (хотя по заданию 128M)
+
+          # --- Жизненный цикл для инициализации 5-10 секунд ---
+          # startProbe ждёт завершения init, не убивая под.
+          # livenessProbe – проверка, жив ли процесс.
+          # readinessProbe – готов принимать трафик.
+          startupProbe:
+            httpGet:
+              path: /health/startup   # эндпоинт, который отвечает 200 только после init
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 2
+            failureThreshold: 15      # 15 * 2 = 30 сек, запас на init
+            timeoutSeconds: 2
+
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 8080
+            initialDelaySeconds: 15   # даём время на startupProbe
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
+
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 2
+
+          # --- Graceful shutdown (чтобы не обрывать запросы при удалении пода) ---
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 15 && kill -SIGTERM 1"]
+
+      # Политика вытеснения пода при дефиците ресурсов – Burstable (из-за requests != limits у CPU)
+      # Чтобы при ночной нагрузке поды не вытеснялись, requests CPU достаточно низкие.
+      # Для экономии ресурсов ночью используем HPA с schedule.
+---
+# HPA (Horizontal Pod Autoscaler) с учётом дневного цикла
+# Используем два профиля: днём – больше подов, ночью – меньше.
+# Чистое решение: HPA по CPU, но со специальной конфигурацией.
+# Однако HPA не умеет schedule "из коробки". Используем KEDA (расширение) или CronHPA.
+# Для простоты реализации в манифесте – опишем HPA, который работает по CPU,
+# и добавим CronJob для изменения minReplicas по расписанию.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mindbox-app-hpa
+  namespace: app-prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mindbox-app
+  minReplicas: 2          # ночью можно снижать, но не до 0 (чтобы не терять инициализацию)
+  maxReplicas: 6          # небольшой запас на случай аномальных пиков
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70   # держим CPU utilisation ~70% на под
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300   # ждём 5 минут перед уменьшением (избегаем колебаний)
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+---
+# CronJob для уменьшения числа подов ночью и увеличения днём
+# Это "костыль", но в задании не ограничивали инструменты, а KEDA добавил бы сложность.
+# Упрощённо: каждую ночь ставим minReplicas=2, днём – 4.
+# В реальной жизни использовали бы KEDA с ScaledObject и cron trigger.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-app-for-day-night
+  namespace: app-prod
+spec:
+  schedule: "0 8 * * *"   # 8 утра – дневной режим (min=4)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - kubectl -n app-prod patch hpa mindbox-app-hpa --type merge --patch '{"spec":{"minReplicas":4}}'
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-app-night
+  namespace: app-prod
+spec:
+  schedule: "0 22 * * *"  # 10 вечера – ночной режим (min=2)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - kubectl -n app-prod patch hpa mindbox-app-hpa --type merge --patch '{"spec":{"minReplicas":2}}'
+          restartPolicy: OnFailure
+---
+# Service для доступа к приложению
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindbox-app-svc
+  namespace: app-prod
+spec:
+  selector:
+    app: mindbox-app
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP   # внутри кластера; внешний доступ – через Ingress
