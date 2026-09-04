@@ -1,0 +1,21 @@
+diploma/
+├── main.tf
+├── variables.tf
+├── terraform.tfvars
+├── network.tf
+├── instances.tf
+├── alb.tf
+├── backup.tf
+├── outputs.tf
+├── providers.tf
+├── inventory/
+│   └── prod.yml
+├── playbooks/
+│   ├── webserver.yml
+│   ├── zabbix-agent.yml
+│   └── filebeat.yml
+├── templates/
+│   ├── zabbix_agentd.conf.j2
+│   └── filebeat.yml.j2
+└── static/
+    └── index.html
