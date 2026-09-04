@@ -1,21 +1,32 @@
 diploma/
-├── main.tf
-├── variables.tf
-├── terraform.tfvars
-├── network.tf
-├── instances.tf
-├── alb.tf
-├── backup.tf
-├── outputs.tf
-├── providers.tf
-├── inventory/
-│   └── prod.yml
-├── playbooks/
-│   ├── webserver.yml
-│   ├── zabbix-agent.yml
-│   └── filebeat.yml
-├── templates/
-│   ├── zabbix_agentd.conf.j2
-│   └── filebeat.yml.j2
-└── static/
-    └── index.html
+├── README.md                    # Описание проекта
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── providers.tf
+│   ├── network.tf
+│   ├── instances.tf
+│   ├── alb.tf
+│   ├── backup.tf
+│   └── outputs.tf
+├── ansible/
+│   ├── inventory/
+│   │   └── prod.yml
+│   ├── playbooks/
+│   │   ├── webserver.yml
+│   │   ├── zabbix-agent.yml
+│   │   ├── filebeat.yml
+│   │   └── elasticsearch.yml
+│   └── templates/
+│       ├── zabbix_agentd.conf.j2
+│       └── filebeat.yml.j2
+├── static/
+│   └── index.html
+├── screenshots/
+│   ├── 01_site_curl.png
+│   ├── 02_zabbix_dashboard.png
+│   ├── 03_kibana_logs.png
+│   ├── 04_terraform_apply.png
+│   └── 05_ansible_playbook.png
+└── docs/
+    └── architecture.md
