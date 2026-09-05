@@ -1,0 +1,32 @@
+cat > ansible/playbooks/webserver.yml << 'EOF'
+---
+- name: Install and configure Nginx
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy website
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head><title>Diploma Project</title></head>
+          <body>
+            <h1>Отказоустойчивый сайт</h1>
+            <p>Сервер: {{ ansible_hostname }}</p>
+            <p>Зона: {{ ansible_zone | default('ru-central1') }}</p>
+          </body>
+          </html>
+EOF
