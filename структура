@@ -1,0 +1,27 @@
+diploma/
+├── providers.tf
+├── variables.tf
+├── network.tf
+├── instances.tf
+├── alb.tf
+├── outputs.tf
+├── backup.tf
+├── .gitignore
+├── README.md
+├── screenshots/
+│   ├── 01_site_curl.png
+│   ├── 02_instances.png
+│   ├── 03_terraform_apply.png
+│   ├── 04_snapshots.png
+│   ├── 05_zabbix_dashboard.png
+│   └── 06_kibana_logs.png
+└── ansible/
+    ├── inventory/
+    │   └── prod.yml
+    ├── playbooks/
+    │   ├── webserver.yml
+    │   ├── zabbix-agent.yml
+    │   └── filebeat.yml
+    └── templates/
+        ├── zabbix_agentd.conf.j2
+        └── filebeat.yml.j2
