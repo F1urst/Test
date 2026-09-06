@@ -1,12 +1,32 @@
-cat > ansible/inventory.yml << 'EOF'
-all:
-  children:
-    webservers:
-      hosts:
-        web-1.ru-central1.internal:
-        web-2.ru-central1.internal:
-  vars:
-    ansible_user: ubuntu
-    ansible_ssh_private_key_file: ~/.ssh/id_rsa
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+cat > ansible/playbooks/webserver.yml << 'EOF'
+---
+- name: Setup web servers
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy website
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head><title>Diploma Project</title></head>
+          <body>
+            <h1>Отказоустойчивый сайт</h1>
+            <p>Сервер: {{ ansible_hostname }}</p>
+            <p>Зона: {{ ansible_zone }}</p>
+          </body>
+          </html>
 EOF
