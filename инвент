@@ -1,0 +1,19 @@
+cat > ansible/inventory/prod.yml << 'EOF'
+all:
+  children:
+    webservers:
+      hosts:
+        web-1.ru-central1.internal:
+        web-2.ru-central1.internal:
+    monitoring:
+      hosts:
+        zabbix.ru-central1.internal:
+    logging:
+      hosts:
+        elastic.ru-central1.internal:
+        kibana.ru-central1.internal:
+  vars:
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa
+    ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@93.77.176.21"'
+EOF
