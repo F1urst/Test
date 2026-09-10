@@ -1,0 +1,30 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 158.160.158.245:80...
+* Connected to 158.160.158.245 (158.160.158.245) port 80
+> GET / HTTP/1.1
+> Host: 158.160.158.245
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< server: ycalb
+< date: Fri, 04 Sep 2026 15:06:35 GMT
+< content-type: text/html
+< content-length: 199
+< last-modified: Fri, 04 Sep 2026 14:45:46 GMT
+< etag: "6a9ad99a-c7"
+< accept-ranges: bytes
+< 
+{ [199 bytes data]
+100   199  100   199    0     0   6716      0 --:--:-- --:--:-- --:--:--  6862
+* Connection #0 to host 158.160.158.245 left intact
+<!DOCTYPE html>
+<html>
+<head><title>Diploma Project</title></head>
+<body>
+<h1>Отказоустойчивый сайт</h1>
+<p>Сервер: web-2</p>
+<p>Зона: ru-central1-b</p>
+</body>
+</html>

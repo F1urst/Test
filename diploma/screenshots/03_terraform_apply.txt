@@ -1,0 +1,90 @@
+[0m[1myandex_vpc_gateway.nat-gateway: Refreshing state... [id=enpkq1d85uh43vqj817s][0m
+[0m[1myandex_alb_http_router.web-router: Refreshing state... [id=ds7aqmse2eleia06l2tl][0m
+[0m[1myandex_vpc_network.diploma-net: Refreshing state... [id=enp8skpg4sa237c89o0b][0m
+[0m[1myandex_vpc_subnet.public-a: Refreshing state... [id=e9btadnaflbppprh2lpn][0m
+[0m[1myandex_vpc_route_table.private-route: Refreshing state... [id=enpuj4bac4b2at8pgsoh][0m
+[0m[1myandex_compute_instance.kibana: Refreshing state... [id=fhmllu56jdfai70n1399][0m
+[0m[1myandex_alb_load_balancer.web-alb: Refreshing state... [id=ds7tpl7i092e4egk77t0][0m
+[0m[1myandex_compute_instance.bastion: Refreshing state... [id=fhm5ldr7he9brme558qc][0m
+[0m[1myandex_compute_instance.zabbix: Refreshing state... [id=fhm4o3k1bnvr8l54moln][0m
+[0m[1myandex_vpc_subnet.private-a: Refreshing state... [id=e9bibkch3er9sqjh4u7m][0m
+[0m[1myandex_vpc_subnet.private-b: Refreshing state... [id=e2l34rfha5bf722idls7][0m
+[0m[1myandex_compute_instance.web-2: Refreshing state... [id=epdjgosloj5ot97ku682][0m
+[0m[1myandex_compute_instance.web-1: Refreshing state... [id=fhm2lijtalkr31kl3vo6][0m
+[0m[1myandex_compute_instance.elastic: Refreshing state... [id=fhmobir9ajj38eegaida][0m
+[0m[1myandex_alb_target_group.web-tg: Refreshing state... [id=ds7j8qe7htg0j4b7fngb][0m
+[0m[1myandex_alb_backend_group.web-bg: Refreshing state... [id=ds7lj293s5q6hk7ftded][0m
+[0m[1myandex_alb_virtual_host.web-vhost: Refreshing state... [id=ds7aqmse2eleia06l2tl/web-vhost][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # yandex_compute_instance.web-1[0m will be updated in-place
+[0m  [33m~[0m[0m resource "yandex_compute_instance" "web-1" {
+        id                        = "fhm2lijtalkr31kl3vo6"
+      [33m~[0m[0m metadata                  = {
+          [31m-[0m[0m "serial-port-enable" = "1" [90m-> null[0m[0m
+          [31m-[0m[0m "ssh-keys"           = <<-EOT
+                yc-serialssh:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDewSf7ldzSlFdi9g1o6R9bt2dAqUNm+MBnR1YKuz/UFjKQn5GqdaHnEvFPp+nyP0LL1/JJWaUpbycGLrSPh44d/IpnXUYL7CJ09TCMtNJhcvhjcHtt5hYlHrly2dkfbkw/5fhRnHrsfJaI0lt3Z7LtlR9gcQtwWIgYP1uJOuft8V6m9NQhkE/myaNx6hwtS5YfXs/QZinxHWQK3HViYJhFSZ7s7CT9B/PqSH2QNnBpx44oTJdELxcoCi/4W8Vq681ikAegEn8AItatBBHFn+V5mqbUMq/uUz1nMCXB0nprZe2D83lg5xRPqQbPZ77qcx0zBs54dOJjKbo8H4H/HJTZOYCTl6HAt9+rZpNNJhZjCHDImguMZxW8ZnoYqjOcBJmTlt+Lt+J84gyXtt5sw+nSkTMQDy408Of/fxUWXA6fTFRfebVQehasWoIcTa+4koxMRuGXPACXsSvIqhA+RRboOvF3RCM5ut2Zk9kbyOzjOnNNJVrR2proUKfDHxdilOR3bZ+H3p2BQBX2Rk2MsuWbWzfsvJ/DTmXu5hOmc/4iJ3L+fAoFBnxFY4TYBpkRjkhn6npnTcSnl9vtdGj6FgCKfMxBrI+B9uOV8jikMcmXHjgRvb/knrqxz1tsigepG5mwCtohaaJfZMs78PFJkCiFB60+oWP285wchfB2neUNRQ==
+            EOT [90m-> null[0m[0m
+          [32m+[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                chpasswd:
+                  list: |
+                    ubuntu:ubuntu123
+                  expire: False
+                ssh_authorized_keys:
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDewSf7ldzSlFdi9g1o6R9bt2dAqUNm+MBnR1YKuz/UFjKQn5GqdaHnEvFPp+nyP0LL1/JJWaUpbycGLrSPh44d/IpnXUYL7CJ09TCMtNJhcvhjcHtt5hYlHrly2dkfbkw/5fhRnHrsfJaI0lt3Z7LtlR9gcQtwWIgYP1uJOuft8V6m9NQhkE/myaNx6hwtS5YfXs/QZinxHWQK3HViYJhFSZ7s7CT9B/PqSH2QNnBpx44oTJdELxcoCi/4W8Vq681ikAegEn8AItatBBHFn+V5mqbUMq/uUz1nMCXB0nprZe2D83lg5xRPqQbPZ77qcx0zBs54dOJjKbo8H4H/HJTZOYCTl6HAt9+rZpNNJhZjCHDImguMZxW8ZnoYqjOcBJmTlt+Lt+J84gyXtt5sw+nSkTMQDy408Of/fxUWXA6fTFRfebVQehasWoIcTa+4koxMRuGXPACXsSvIqhA+RRboOvF3RCM5ut2Zk9kbyOzjOnNNJVrR2proUKfDHxdilOR3bZ+H3p2BQBX2Rk2MsuWbWzfsvJ/DTmXu5hOmc/4iJ3L+fAoFBnxFY4TYBpkRjkhn6npnTcSnl9vtdGj6FgCKfMxBrI+B9uOV8jikMcmXHjgRvb/knrqxz1tsigepG5mwCtohaaJfZMs78PFJkCiFB60+oWP285wchfB2neUNRQ== diploma-project
+            EOT
+        }
+        name                      = "web-1"
+        [90m# (16 unchanged attributes hidden)[0m[0m
+
+        [90m# (6 unchanged blocks hidden)[0m[0m
+    }
+
+[1m  # yandex_compute_instance.web-2[0m will be updated in-place
+[0m  [33m~[0m[0m resource "yandex_compute_instance" "web-2" {
+        id                        = "epdjgosloj5ot97ku682"
+      [33m~[0m[0m metadata                  = {
+          [31m-[0m[0m "serial-port-enable" = "1" [90m-> null[0m[0m
+          [31m-[0m[0m "ssh-keys"           = <<-EOT
+                yc-serialssh:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDewSf7ldzSlFdi9g1o6R9bt2dAqUNm+MBnR1YKuz/UFjKQn5GqdaHnEvFPp+nyP0LL1/JJWaUpbycGLrSPh44d/IpnXUYL7CJ09TCMtNJhcvhjcHtt5hYlHrly2dkfbkw/5fhRnHrsfJaI0lt3Z7LtlR9gcQtwWIgYP1uJOuft8V6m9NQhkE/myaNx6hwtS5YfXs/QZinxHWQK3HViYJhFSZ7s7CT9B/PqSH2QNnBpx44oTJdELxcoCi/4W8Vq681ikAegEn8AItatBBHFn+V5mqbUMq/uUz1nMCXB0nprZe2D83lg5xRPqQbPZ77qcx0zBs54dOJjKbo8H4H/HJTZOYCTl6HAt9+rZpNNJhZjCHDImguMZxW8ZnoYqjOcBJmTlt+Lt+J84gyXtt5sw+nSkTMQDy408Of/fxUWXA6fTFRfebVQehasWoIcTa+4koxMRuGXPACXsSvIqhA+RRboOvF3RCM5ut2Zk9kbyOzjOnNNJVrR2proUKfDHxdilOR3bZ+H3p2BQBX2Rk2MsuWbWzfsvJ/DTmXu5hOmc/4iJ3L+fAoFBnxFY4TYBpkRjkhn6npnTcSnl9vtdGj6FgCKfMxBrI+B9uOV8jikMcmXHjgRvb/knrqxz1tsigepG5mwCtohaaJfZMs78PFJkCiFB60+oWP285wchfB2neUNRQ==
+            EOT [90m-> null[0m[0m
+          [32m+[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                chpasswd:
+                  list: |
+                    ubuntu:ubuntu123
+                  expire: False
+                ssh_authorized_keys:
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDewSf7ldzSlFdi9g1o6R9bt2dAqUNm+MBnR1YKuz/UFjKQn5GqdaHnEvFPp+nyP0LL1/JJWaUpbycGLrSPh44d/IpnXUYL7CJ09TCMtNJhcvhjcHtt5hYlHrly2dkfbkw/5fhRnHrsfJaI0lt3Z7LtlR9gcQtwWIgYP1uJOuft8V6m9NQhkE/myaNx6hwtS5YfXs/QZinxHWQK3HViYJhFSZ7s7CT9B/PqSH2QNnBpx44oTJdELxcoCi/4W8Vq681ikAegEn8AItatBBHFn+V5mqbUMq/uUz1nMCXB0nprZe2D83lg5xRPqQbPZ77qcx0zBs54dOJjKbo8H4H/HJTZOYCTl6HAt9+rZpNNJhZjCHDImguMZxW8ZnoYqjOcBJmTlt+Lt+J84gyXtt5sw+nSkTMQDy408Of/fxUWXA6fTFRfebVQehasWoIcTa+4koxMRuGXPACXsSvIqhA+RRboOvF3RCM5ut2Zk9kbyOzjOnNNJVrR2proUKfDHxdilOR3bZ+H3p2BQBX2Rk2MsuWbWzfsvJ/DTmXu5hOmc/4iJ3L+fAoFBnxFY4TYBpkRjkhn6npnTcSnl9vtdGj6FgCKfMxBrI+B9uOV8jikMcmXHjgRvb/knrqxz1tsigepG5mwCtohaaJfZMs78PFJkCiFB60+oWP285wchfB2neUNRQ== diploma-project
+            EOT
+        }
+        name                      = "web-2"
+        [90m# (16 unchanged attributes hidden)[0m[0m
+
+        [90m# (6 unchanged blocks hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 2 to change, 0 to destroy.
+[0m[1myandex_compute_instance.web-2: Modifying... [id=epdjgosloj5ot97ku682][0m[0m
+[0m[1myandex_compute_instance.web-1: Modifying... [id=fhm2lijtalkr31kl3vo6][0m[0m
+[0m[1myandex_compute_instance.web-2: Modifications complete after 4s [id=epdjgosloj5ot97ku682][0m
+[0m[1myandex_compute_instance.web-1: Modifications complete after 8s [id=fhm2lijtalkr31kl3vo6][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 2 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0malb_ip = "158.160.158.245"
+bastion_ip = "93.77.176.21"
+elastic_private_ip = "192.168.20.34"
+kibana_ip = "111.88.246.77"
+load_balancer_ip = "158.160.158.245"
+web_1_private_ip = "192.168.20.4"
+web_2_private_ip = "192.168.21.24"
+zabbix_ip = "111.88.241.219"

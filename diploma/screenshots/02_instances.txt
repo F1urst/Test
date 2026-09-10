@@ -1,0 +1,11 @@
++----------------------+---------+---------------+---------+----------------+---------------+
+|          ID          |  NAME   |    ZONE ID    | STATUS  |  EXTERNAL IP   |  INTERNAL IP  |
++----------------------+---------+---------------+---------+----------------+---------------+
+| epdjgosloj5ot97ku682 | web-2   | ru-central1-b | RUNNING |                | 192.168.21.24 |
+| fhm2lijtalkr31kl3vo6 | web-1   | ru-central1-a | RUNNING |                | 192.168.20.4  |
+| fhm4o3k1bnvr8l54moln | zabbix  | ru-central1-a | RUNNING | 111.88.241.219 | 192.168.10.30 |
+| fhm5ldr7he9brme558qc | bastion | ru-central1-a | RUNNING | 93.77.176.21   | 192.168.10.29 |
+| fhmllu56jdfai70n1399 | kibana  | ru-central1-a | RUNNING | 111.88.246.77  | 192.168.10.15 |
+| fhmobir9ajj38eegaida | elastic | ru-central1-a | RUNNING |                | 192.168.20.34 |
++----------------------+---------+---------------+---------+----------------+---------------+
+
