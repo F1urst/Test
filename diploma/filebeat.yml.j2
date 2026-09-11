@@ -1,0 +1,24 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/access.log
+  fields:
+    log_type: nginx_access
+    server: {{ ansible_hostname }}
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/error.log
+  fields:
+    log_type: nginx_error
+    server: {{ ansible_hostname }}
+
+output.elasticsearch:
+  hosts: ["192.168.20.34:9200"]
+  index: "nginx-logs-%{+yyyy.MM.dd}"
+
+setup.ilm.enabled: false
+setup.template.name: "nginx-logs"
+setup.template.pattern: "nginx-logs-*"
