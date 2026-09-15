@@ -16,14 +16,9 @@
         enabled: yes
 
     - name: Deploy website
-      copy:
+      template:
+        src: index.html.j2
         dest: /var/www/html/index.html
-        content: |
-          <!DOCTYPE html>
-          <html>
-          <head><title>Diploma Project</title></head>
-          <body>
-            <h1>Отказоустойчивый сайт</h1>
-            <p>Сервер: {{ ansible_hostname }}</p>
-          </body>
-          </html>
+        owner: www-data
+        group: www-data
+        mode: '0644'
