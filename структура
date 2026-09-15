@@ -5,7 +5,7 @@ diploma/
 │
 ├── providers.tf
 ├── variables.tf
-├── terraform.tfvars.example    # Пример без секретов
+├── terraform.tfvars.example   
 ├── network.tf
 ├── security.tf
 ├── instances.tf
