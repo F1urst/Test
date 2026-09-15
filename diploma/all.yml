@@ -1,0 +1,6 @@
+---
+zabbix_server_ip: "{{ hostvars['zabbix.ru-central1.internal']['ansible_host'] }}"
+elasticsearch_host: "elastic.ru-central1.internal"
+elasticsearch_port: 9200
+kibana_host: "kibana.ru-central1.internal"
+kibana_port: 5601
