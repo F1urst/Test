@@ -23,17 +23,27 @@
       template:
         src: filebeat.yml.j2
         dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: '0644'
       notify: restart filebeat
 
     - name: Enable Nginx module
       command: filebeat modules enable nginx
+      args:
+        creates: /etc/filebeat/modules.d/nginx.yml
 
     - name: Setup Filebeat
       command: filebeat setup
+
+    - name: Start Filebeat
+      service:
+        name: filebeat
+        state: started
+        enabled: yes
 
   handlers:
     - name: restart filebeat
       service:
         name: filebeat
         state: restarted
-        enabled: yes
