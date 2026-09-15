@@ -1,10 +1,10 @@
-# Бастион-хост (публичный IP)
+# Бастион-хост
 resource "yandex_compute_instance" "bastion" {
-  name        = "bastion"
-  hostname    = "bastion"
+  name                      = "bastion"
+  hostname                  = "bastion"
   allow_stopping_for_update = true
-  platform_id = "standard-v2"
-  zone        = "ru-central1-a"
+  platform_id               = "standard-v2"
+  zone                      = "ru-central1-a"
 
   resources {
     cores  = 2
@@ -13,14 +13,15 @@ resource "yandex_compute_instance" "bastion" {
 
   boot_disk {
     initialize_params {
-      image_id = "fd817i7o8012578061ra"
+      image_id = var.image_id
       size     = 10
     }
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.public-a.id
-    nat       = true
+    subnet_id          = yandex_vpc_subnet.this["public-a"].id
+    nat                = true
+    security_group_ids = [yandex_vpc_security_group.bastion.id]
   }
 
   metadata = {
@@ -28,13 +29,15 @@ resource "yandex_compute_instance" "bastion" {
   }
 }
 
-# Веб-сервер 1 (приватный, зона A) - С ПАРОЛЕМ
-resource "yandex_compute_instance" "web-1" {
-  name        = "web-1"
-  hostname    = "web-1"
+# Веб-серверы (создание в цикле)
+resource "yandex_compute_instance" "web" {
+  for_each = var.web_servers
+
+  name                      = each.key
+  hostname                  = each.key
   allow_stopping_for_update = true
-  platform_id = "standard-v2"
-  zone        = "ru-central1-a"
+  platform_id               = "standard-v2"
+  zone                      = each.value.zone
 
   resources {
     cores  = 2
@@ -43,14 +46,15 @@ resource "yandex_compute_instance" "web-1" {
 
   boot_disk {
     initialize_params {
-      image_id = "fd817i7o8012578061ra"
+      image_id = var.image_id
       size     = 10
     }
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.private-a.id
-    nat       = false
+    subnet_id          = yandex_vpc_subnet.this[each.value.subnet_key].id
+    nat                = false
+    security_group_ids = [yandex_vpc_security_group.web.id]
   }
 
   metadata = {
@@ -58,43 +62,13 @@ resource "yandex_compute_instance" "web-1" {
   }
 }
 
-# Веб-сервер 2 (приватный, зона B) - С ПАРОЛЕМ
-resource "yandex_compute_instance" "web-2" {
-  name        = "web-2"
-  hostname    = "web-2"
-  allow_stopping_for_update = true
-  platform_id = "standard-v2"
-  zone        = "ru-central1-b"
-
-  resources {
-    cores  = 2
-    memory = 2
-  }
-
-  boot_disk {
-    initialize_params {
-      image_id = "fd817i7o8012578061ra"
-      size     = 10
-    }
-  }
-
-  network_interface {
-    subnet_id = yandex_vpc_subnet.private-b.id
-    nat       = false
-  }
-
-  metadata = {
-    user-data = "#cloud-config\nchpasswd:\n  list: |\n    ubuntu:ubuntu123\n  expire: False\nssh_authorized_keys:\n  - ${file(var.ssh_key_path)}"
-  }
-}
-
-# Zabbix (публичный IP)
+# Zabbix сервер
 resource "yandex_compute_instance" "zabbix" {
-  name        = "zabbix"
-  hostname    = "zabbix"
+  name                      = "zabbix"
+  hostname                  = "zabbix"
   allow_stopping_for_update = true
-  platform_id = "standard-v2"
-  zone        = "ru-central1-a"
+  platform_id               = "standard-v2"
+  zone                      = "ru-central1-a"
 
   resources {
     cores  = 2
@@ -103,14 +77,15 @@ resource "yandex_compute_instance" "zabbix" {
 
   boot_disk {
     initialize_params {
-      image_id = "fd817i7o8012578061ra"
+      image_id = var.image_id
       size     = 20
     }
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.public-a.id
-    nat       = true
+    subnet_id          = yandex_vpc_subnet.this["public-a"].id
+    nat                = true
+    security_group_ids = [yandex_vpc_security_group.zabbix.id]
   }
 
   metadata = {
@@ -118,13 +93,13 @@ resource "yandex_compute_instance" "zabbix" {
   }
 }
 
-# Elasticsearch (приватный)
+# Elasticsearch
 resource "yandex_compute_instance" "elastic" {
-  name        = "elastic"
-  hostname    = "elastic"
+  name                      = "elastic"
+  hostname                  = "elastic"
   allow_stopping_for_update = true
-  platform_id = "standard-v2"
-  zone        = "ru-central1-a"
+  platform_id               = "standard-v2"
+  zone                      = "ru-central1-a"
 
   resources {
     cores  = 2
@@ -133,14 +108,15 @@ resource "yandex_compute_instance" "elastic" {
 
   boot_disk {
     initialize_params {
-      image_id = "fd817i7o8012578061ra"
+      image_id = var.image_id
       size     = 30
     }
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.private-a.id
-    nat       = false
+    subnet_id          = yandex_vpc_subnet.this["private-a"].id
+    nat                = false
+    security_group_ids = [yandex_vpc_security_group.elastic.id]
   }
 
   metadata = {
@@ -148,13 +124,13 @@ resource "yandex_compute_instance" "elastic" {
   }
 }
 
-# Kibana (публичный IP)
+# Kibana
 resource "yandex_compute_instance" "kibana" {
-  name        = "kibana"
-  hostname    = "kibana"
+  name                      = "kibana"
+  hostname                  = "kibana"
   allow_stopping_for_update = true
-  platform_id = "standard-v2"
-  zone        = "ru-central1-a"
+  platform_id               = "standard-v2"
+  zone                      = "ru-central1-a"
 
   resources {
     cores  = 2
@@ -163,14 +139,15 @@ resource "yandex_compute_instance" "kibana" {
 
   boot_disk {
     initialize_params {
-      image_id = "fd817i7o8012578061ra"
+      image_id = var.image_id
       size     = 15
     }
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.public-a.id
-    nat       = true
+    subnet_id          = yandex_vpc_subnet.this["public-a"].id
+    nat                = true
+    security_group_ids = [yandex_vpc_security_group.kibana.id]
   }
 
   metadata = {
