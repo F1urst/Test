@@ -1,26 +1,25 @@
-# Target Group (целевая группа)
-resource "yandex_alb_target_group" "web-tg" {
+# Target Group с dynamic
+resource "yandex_alb_target_group" "web" {
   name = "web-target-group"
 
-  target {
-    subnet_id  = yandex_vpc_subnet.private-a.id
-    ip_address = yandex_compute_instance.web-1.network_interface[0].ip_address
-  }
-  target {
-    subnet_id  = yandex_vpc_subnet.private-b.id
-    ip_address = yandex_compute_instance.web-2.network_interface[0].ip_address
+  dynamic "target" {
+    for_each = yandex_compute_instance.web
+    content {
+      subnet_id  = target.value.network_interface[0].subnet_id
+      ip_address = target.value.network_interface[0].ip_address
+    }
   }
 }
 
-# Backend Group (бэкенд группа)
-resource "yandex_alb_backend_group" "web-bg" {
+# Backend Group
+resource "yandex_alb_backend_group" "web" {
   name = "web-backend-group"
 
   http_backend {
     name             = "web-backend"
     weight           = 1
     port             = 80
-    target_group_ids = [yandex_alb_target_group.web-tg.id]
+    target_group_ids = [yandex_alb_target_group.web.id]
 
     healthcheck {
       timeout  = "10s"
@@ -33,19 +32,19 @@ resource "yandex_alb_backend_group" "web-bg" {
 }
 
 # HTTP Router
-resource "yandex_alb_http_router" "web-router" {
+resource "yandex_alb_http_router" "web" {
   name = "web-router"
 }
 
-resource "yandex_alb_virtual_host" "web-vhost" {
+resource "yandex_alb_virtual_host" "web" {
   name           = "web-vhost"
-  http_router_id = yandex_alb_http_router.web-router.id
+  http_router_id = yandex_alb_http_router.web.id
 
   route {
     name = "default-route"
     http_route {
       http_route_action {
-        backend_group_id = yandex_alb_backend_group.web-bg.id
+        backend_group_id = yandex_alb_backend_group.web.id
         timeout          = "60s"
       }
     }
@@ -53,14 +52,15 @@ resource "yandex_alb_virtual_host" "web-vhost" {
 }
 
 # Application Load Balancer
-resource "yandex_alb_load_balancer" "web-alb" {
-  name        = "web-alb"
-  network_id  = yandex_vpc_network.diploma-net.id
+resource "yandex_alb_load_balancer" "web" {
+  name               = "web-alb"
+  network_id         = yandex_vpc_network.this.id
+  security_group_ids = [yandex_vpc_security_group.alb.id]
 
   allocation_policy {
     location {
       zone_id   = "ru-central1-a"
-      subnet_id = yandex_vpc_subnet.public-a.id
+      subnet_id = yandex_vpc_subnet.this["public-a"].id
     }
   }
 
@@ -76,12 +76,8 @@ resource "yandex_alb_load_balancer" "web-alb" {
     }
     http {
       handler {
-        http_router_id = yandex_alb_http_router.web-router.id
+        http_router_id = yandex_alb_http_router.web.id
       }
     }
   }
-}
-
-output "alb_ip" {
-  value = yandex_alb_load_balancer.web-alb.listener[0].endpoint[0].address[0].external_ipv4_address[0].address
 }
