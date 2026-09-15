@@ -10,6 +10,8 @@ all:
     logging:
       hosts:
         elastic.ru-central1.internal:
+    kibana:
+      hosts:
         kibana.ru-central1.internal:
     bastion:
       hosts:
