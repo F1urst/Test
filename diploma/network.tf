@@ -1,44 +1,27 @@
-# Сеть VPC
-resource "yandex_vpc_network" "diploma-net" {
+# VPC сеть
+resource "yandex_vpc_network" "this" {
   name = "diploma-network"
 }
 
-# Публичная подсеть (зона A)
-resource "yandex_vpc_subnet" "public-a" {
-  name           = "public-subnet-a"
-  zone           = "ru-central1-a"
-  network_id     = yandex_vpc_network.diploma-net.id
-  v4_cidr_blocks = ["192.168.10.0/24"]
+# Создание подсетей в цикле
+resource "yandex_vpc_subnet" "this" {
+  for_each       = var.subnets
+  name           = each.key
+  zone           = each.value.zone
+  network_id     = yandex_vpc_network.this.id
+  v4_cidr_blocks = [each.value.cidr]
 }
 
-# Приватная подсеть (зона A) с маршрутом через NAT
-resource "yandex_vpc_subnet" "private-a" {
-  name           = "private-subnet-a"
-  zone           = "ru-central1-a"
-  network_id     = yandex_vpc_network.diploma-net.id
-  v4_cidr_blocks = ["192.168.20.0/24"]
-  route_table_id = yandex_vpc_route_table.private-route.id
-}
-
-# Приватная подсеть (зона B) с маршрутом через NAT
-resource "yandex_vpc_subnet" "private-b" {
-  name           = "private-subnet-b"
-  zone           = "ru-central1-b"
-  network_id     = yandex_vpc_network.diploma-net.id
-  v4_cidr_blocks = ["192.168.21.0/24"]
-  route_table_id = yandex_vpc_route_table.private-route.id
-}
-
-# NAT-шлюз для доступа в интернет из приватных подсетей
-resource "yandex_vpc_gateway" "nat-gateway" {
+# NAT-шлюз для доступа в интернет
+resource "yandex_vpc_gateway" "nat" {
   name = "diploma-nat"
   shared_egress_gateway {}
 }
 
-# Маршрут для приватных подсетей через NAT
-resource "yandex_vpc_route_table" "private-route" {
+# Таблица маршрутизации
+resource "yandex_vpc_route_table" "private" {
   name       = "private-route"
-  network_id = yandex_vpc_network.diploma-net.id
+  network_id = yandex_vpc_network.this.id
 
   static_route {
     destination_prefix = "0.0.0.0/0"
