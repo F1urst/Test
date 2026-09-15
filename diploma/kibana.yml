@@ -1,0 +1,41 @@
+---
+- name: Install Kibana
+  hosts: kibana
+  become: yes
+  tasks:
+    - name: Add Elasticsearch GPG key
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: Add Elasticsearch repository
+      apt_repository:
+        repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+        state: present
+        update_cache: yes
+
+    - name: Install Kibana
+      apt:
+        name: kibana
+        state: present
+
+    - name: Configure Kibana
+      template:
+        src: kibana.yml.j2
+        dest: /etc/kibana/kibana.yml
+        owner: root
+        group: kibana
+        mode: '0660'
+      notify: restart kibana
+
+    - name: Start Kibana
+      service:
+        name: kibana
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart kibana
+      service:
+        name: kibana
+        state: restarted
