@@ -16,7 +16,7 @@ filebeat.inputs:
     server: {{ ansible_hostname }}
 
 output.elasticsearch:
-  hosts: ["192.168.20.34:9200"]
+  hosts: ["{{ elasticsearch_host }}:{{ elasticsearch_port }}"]
   index: "nginx-logs-%{+yyyy.MM.dd}"
 
 setup.ilm.enabled: false
