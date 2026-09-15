@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head><title>Diploma Project</title></head>
+<body>
+<h1>Отказоустойчивый сайт</h1>
+<p>Сервер: {{ ansible_hostname }}</p>
+<p>Зона: {{ ansible_zone | default('unknown') }}</p>
+</body>
+</html>
