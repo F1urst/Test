@@ -1,0 +1,7 @@
+server.port: {{ kibana_port }}
+server.host: "0.0.0.0"
+server.name: "{{ ansible_hostname }}"
+elasticsearch.hosts: ["http://{{ elasticsearch_host }}:{{ elasticsearch_port }}"]
+logging.dest: /var/log/kibana/kibana.log
+xpack.security.enabled: false
+xpack.reporting.enabled: false
