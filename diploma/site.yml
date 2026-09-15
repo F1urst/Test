@@ -1,0 +1,7 @@
+---
+- import_playbook: webserver.yml
+- import_playbook: zabbix.yml
+- import_playbook: zabbix-agent.yml
+- import_playbook: elasticsearch.yml
+- import_playbook: kibana.yml
+- import_playbook: filebeat.yml
