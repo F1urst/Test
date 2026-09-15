@@ -1,27 +1,43 @@
-diploma/
-├── providers.tf
-├── variables.tf
-├── network.tf
-├── instances.tf
-├── alb.tf
-├── outputs.tf
-├── backup.tf
+diploma-infrastructure/
+│
 ├── .gitignore
 ├── README.md
-├── screenshots/
-│   ├── 01_site_curl.png
-│   ├── 02_instances.png
-│   ├── 03_terraform_apply.png
-│   ├── 04_snapshots.png
-│   ├── 05_zabbix_dashboard.png
-│   └── 06_kibana_logs.png
-└── ansible/
-    ├── inventory/
-    │   └── prod.yml
-    ├── playbooks/
-    │   ├── webserver.yml
-    │   ├── zabbix-agent.yml
-    │   └── filebeat.yml
-    └── templates/
-        ├── zabbix_agentd.conf.j2
-        └── filebeat.yml.j2
+│
+├── providers.tf
+├── variables.tf
+├── terraform.tfvars.example    # Пример без секретов
+├── network.tf
+├── security.tf
+├── instances.tf
+├── alb.tf
+├── snapshots.tf
+├── outputs.tf
+│
+├── ansible/
+│   ├── ansible.cfg
+│   ├── inventory/
+│   │   └── prod.yml
+│   ├── group_vars/
+│   │   └── all.yml
+│   ├── playbooks/
+│   │   ├── site.yml
+│   │   ├── webserver.yml
+│   │   ├── zabbix.yml
+│   │   ├── zabbix-agent.yml
+│   │   ├── elasticsearch.yml
+│   │   ├── kibana.yml
+│   │   └── filebeat.yml
+│   └── templates/
+│       ├── index.html.j2
+│       ├── zabbix_agentd.conf.j2
+│       ├── elasticsearch.yml.j2
+│       ├── kibana.yml.j2
+│       └── filebeat.yml.j2
+│
+└── screenshots/
+    ├── 01_site_curl.png
+    ├── 02_instances.png
+    ├── 03_terraform_apply.png
+    ├── 04_snapshots.png
+    ├── 05_zabbix_dashboard.png
+    └── 06_kibana_logs.png
